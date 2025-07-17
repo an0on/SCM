@@ -519,6 +519,68 @@ const SuperAdminDashboard: React.FC = () => {
             </div>
           )}
 
+          {/* Users Tab */}
+          {activeTab === 'users' && (
+            <div className="space-y-6">
+              <div className="card">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Benutzer-Management</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 border rounded">
+                    <div>
+                      <p className="font-medium text-gray-900">Admin-Rollen verwalten</p>
+                      <p className="text-sm text-gray-500">Benutzer zu Admin oder Head Judge befördern</p>
+                    </div>
+                    <button className="btn-primary">
+                      <Users className="h-4 w-4 mr-2" />
+                      Rollen verwalten
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between p-4 border rounded">
+                    <div>
+                      <p className="font-medium text-gray-900">Benutzer sperren</p>
+                      <p className="text-sm text-gray-500">Problematische Benutzer deaktivieren</p>
+                    </div>
+                    <button className="btn-secondary">
+                      <Lock className="h-4 w-4 mr-2" />
+                      Benutzer sperren
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Audit Tab */}
+          {activeTab === 'audit' && (
+            <div className="space-y-6">
+              <div className="card">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Vollständiges Audit-Log</h3>
+                <div className="space-y-3">
+                  {auditLogs.length > 0 ? auditLogs.map(log => (
+                    <div key={log.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{log.action}</p>
+                        <p className="text-xs text-gray-500">
+                          User {log.user_id?.slice(0, 8) || 'System'} • {new Date(log.created_at).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Resource: {log.resource_type} • IP: {log.ip_address || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {log.resource_id && `ID: ${log.resource_id.slice(0, 8)}`}
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>Keine Audit-Logs vorhanden</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Security Sessions Tab */}
           {activeTab === 'security' && (
             <div className="space-y-6">

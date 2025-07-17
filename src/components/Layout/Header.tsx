@@ -55,15 +55,24 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-2">
-                <button className="p-2 text-gray-700 hover:text-gray-900">
+                <button 
+                  onClick={() => navigate('/profile')}
+                  className="p-2 text-gray-700 hover:text-gray-900"
+                  title="Profil"
+                >
                   <User size={20} />
                 </button>
-                <button className="p-2 text-gray-700 hover:text-gray-900">
+                <button 
+                  onClick={() => navigate('/settings')}
+                  className="p-2 text-gray-700 hover:text-gray-900"
+                  title="Einstellungen"
+                >
                   <Settings size={20} />
                 </button>
                 <button 
                   onClick={handleSignOut}
                   className="p-2 text-gray-700 hover:text-gray-900"
+                  title="Ausloggen"
                 >
                   <LogOut size={20} />
                 </button>

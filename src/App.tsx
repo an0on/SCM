@@ -17,6 +17,8 @@ import PublicScoreboard from './pages/Scoreboard/PublicScoreboard';
 import SuperAdminInitialSetup from './pages/Auth/SuperAdminInitialSetup';
 import SuperAdminLogin from './pages/Auth/SuperAdminLogin';
 import SuperAdminDashboard from './pages/SuperAdmin/SuperAdminDashboard';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import Privacy from './pages/Privacy';
 import CookieConsent from './components/GDPR/CookieConsent';
 import './App.css';
@@ -71,6 +73,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               } 
             />
