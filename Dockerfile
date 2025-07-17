@@ -35,9 +35,10 @@ RUN npm run build
 # Production Stage mit Nginx
 FROM nginx:1.25-alpine AS production
 
-# Security-Updates installieren
+# Security-Updates und curl installieren
 RUN apk add --no-cache --upgrade apk-tools && \
-    apk upgrade --no-cache
+    apk upgrade --no-cache && \
+    apk add --no-cache curl
 
 # Custom Nginx-Konfiguration kopieren
 COPY nginx.conf /etc/nginx/nginx.conf
