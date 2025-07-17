@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  # Skateboard Contest App
+  skateboard-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_SUPABASE_URL=${REACT_APP_SUPABASE_URL:-https://supabase.bamboy.de}
+        - REACT_APP_SUPABASE_ANON_KEY=${REACT_APP_SUPABASE_ANON_KEY}
+        - REACT_APP_SUPER_ADMIN_SETUP_TOKEN=${REACT_APP_SUPER_ADMIN_SETUP_TOKEN}
+        - REACT_APP_PAYPAL_CLIENT_ID=${REACT_APP_PAYPAL_CLIENT_ID}
+        - REACT_APP_PAYPAL_MODE=${REACT_APP_PAYPAL_MODE:-production}
+        - REACT_APP_ENVIRONMENT=${REACT_APP_ENVIRONMENT:-production}
+    
+    container_name: skateboard-contest-app
+    
+    ports:
+      - "8080:8080"
+    
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_SUPABASE_URL=${REACT_APP_SUPABASE_URL:-https://supabase.bamboy.de}
+      - REACT_APP_SUPABASE_ANON_KEY=${REACT_APP_SUPABASE_ANON_KEY}
+      - REACT_APP_SUPER_ADMIN_SETUP_TOKEN=${REACT_APP_SUPER_ADMIN_SETUP_TOKEN}
+      - REACT_APP_PAYPAL_CLIENT_ID=${REACT_APP_PAYPAL_CLIENT_ID}
+      - REACT_APP_PAYPAL_MODE=${REACT_APP_PAYPAL_MODE:-production}
+      - REACT_APP_ENVIRONMENT=${REACT_APP_ENVIRONMENT:-production}
+    
+    # Resource Limits für Coolify
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    
+    # Health Check
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/health-check.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Security
+    security_opt:
+      - no-new-privileges:true
+    
+    # Read-only filesystem (außer tmp)
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/log/nginx
+    
+    # Networks
+    networks:
+      - skateboard-network
+    
+    # Labels für Coolify
+    labels:
+      - "coolify.managed=true"
+      - "coolify.version=1.0"
+      - "traefik.enable=true"
+      - "traefik.http.routers.skateboard.rule=Host(`skateboard.bamboy.de`)"
+      - "traefik.http.routers.skateboard.tls.certresolver=letsencrypt"
+      - "traefik.http.services.skateboard.loadbalancer.server.port=8080"
+
+# Development Services (optional)
+  # Redis für Caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: skateboard-redis
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - skateboard-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    profiles:
+      - development
+      - full
+
+  # Monitoring mit Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: skateboard-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    networks:
+      - skateboard-network
+    profiles:
+      - monitoring
+
+# Volumes
+volumes:
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+# Networks
+networks:
+  skateboard-network:
+    driver: bridge
+    name: skateboard-network
