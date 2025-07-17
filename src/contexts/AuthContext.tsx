@@ -59,6 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const fetchUserRoles = async (userId: string) => {
+    console.log('Fetching roles for user:', userId);
+    
     try {
       // Try to get roles from Supabase first
       const { data, error } = await supabase
@@ -66,7 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .select('*')
         .eq('user_id', userId);
 
-      if (!error && data) {
+      if (!error && data && data.length > 0) {
+        console.log('Found roles in Supabase:', data);
         setUserRoles(data);
         return;
       }
@@ -76,14 +79,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Fallback to localStorage for demo (Super Admin)
     const superAdminRole = localStorage.getItem('super_admin_role');
-    if (superAdminRole) {
+    const superAdminUser = localStorage.getItem('super_admin_user');
+    
+    console.log('Checking localStorage for Super Admin role...');
+    console.log('Super Admin Role:', superAdminRole);
+    console.log('Super Admin User:', superAdminUser);
+    
+    if (superAdminRole && superAdminUser) {
       const roleData = JSON.parse(superAdminRole);
-      if (roleData.user_id === userId) {
+      const userData = JSON.parse(superAdminUser);
+      
+      console.log('Parsed role data:', roleData);
+      console.log('Parsed user data:', userData);
+      console.log('Current user email:', user?.email);
+      console.log('Current user id:', userId);
+      
+      // Check if current user is the Super Admin (by email or user_id)
+      if (roleData.user_id === userId || userData.email === user?.email) {
+        console.log('Super Admin role found! Setting roles...');
         setUserRoles([roleData]);
         return;
       }
     }
 
+    console.log('No roles found, setting empty array');
     setUserRoles([]);
   };
 

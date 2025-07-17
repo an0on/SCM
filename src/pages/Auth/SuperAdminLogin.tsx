@@ -174,6 +174,15 @@ const SuperAdminLogin: React.FC = () => {
       // Log audit event (simplified)
       console.log('Super Admin login successful for user:', userId);
 
+      // Set Super Admin role in localStorage
+      const superAdminRole = {
+        id: crypto.randomUUID(),
+        user_id: userId,
+        role: 'super_admin',
+        created_at: new Date().toISOString()
+      };
+      localStorage.setItem('super_admin_role', JSON.stringify(superAdminRole));
+
       // Set user in AuthContext for proper authentication
       await signIn(formData.email, 'dummy-password'); // This will use the localStorage fallback
 

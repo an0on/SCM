@@ -281,6 +281,14 @@ const SuperAdminDashboard: React.FC = () => {
   };
 
   if (!hasRole('super_admin')) {
+    // Debug information
+    console.log('Super Admin Dashboard Access Check:');
+    console.log('User:', user);
+    console.log('Has super_admin role:', hasRole('super_admin'));
+    console.log('All roles:', JSON.stringify(userRoles, null, 2));
+    console.log('Super Admin User in localStorage:', localStorage.getItem('super_admin_user'));
+    console.log('Super Admin Role in localStorage:', localStorage.getItem('super_admin_role'));
+    
     return (
       <Layout>
         <div className="text-center py-12">
@@ -289,6 +297,11 @@ const SuperAdminDashboard: React.FC = () => {
           <p className="mt-1 text-sm text-gray-500">
             Sie haben keine Berechtigung für das Super Admin Dashboard.
           </p>
+          <div className="mt-4 p-4 bg-gray-100 rounded text-left text-xs">
+            <p><strong>Debug Info:</strong></p>
+            <p>User: {user?.email || 'Nicht eingeloggt'}</p>
+            <p>Rollen: {userRoles.length > 0 ? userRoles.map(r => r.role).join(', ') : 'Keine Rollen'}</p>
+          </div>
         </div>
       </Layout>
     );
