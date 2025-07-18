@@ -62,7 +62,7 @@ interface SecuritySession {
 }
 
 const SuperAdminDashboard: React.FC = () => {
-  const { user, hasRole } = useAuth();
+  const { user, hasRole, userRoles } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'audit' | 'security' | 'invitations'>('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
